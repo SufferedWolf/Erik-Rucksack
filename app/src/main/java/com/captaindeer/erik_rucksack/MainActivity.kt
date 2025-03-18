@@ -1,5 +1,9 @@
 package com.captaindeer.erik_rucksack
 
+/**
+ * Created by suffered on 18/03/25
+ */
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
