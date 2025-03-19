@@ -1,4 +1,4 @@
-package com.captaindeer.erik_rucksack.data.LocalDatabaseApp
+package com.captaindeer.erik_rucksack.data.localDatabaseApp
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package com.captaindeer.erik_rucksack.data.LocalDatabaseApp
+package com.captaindeer.erik_rucksack.data.localDatabaseApp
 
 import androidx.lifecycle.LiveData
 
@@ -13,4 +13,9 @@ class TaskRepository(private val taskDao: TaskDao) {
     suspend fun addTask(task: Task){
         taskDao.addTask(task)
     }
+
+    suspend fun deleteTask(task: Task){
+        taskDao.deleteTask(task)
+    }
+
 }

@@ -25,14 +25,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.captaindeer.erik_rucksack.core.utils.ScreensBackHandlerCustom
-import com.captaindeer.erik_rucksack.data.LocalDatabaseApp.Task
+import com.captaindeer.erik_rucksack.data.localDatabaseApp.Task
 import com.captaindeer.erik_rucksack.ui.viewmodels.TaskViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
     ScreensBackHandlerCustom.DoubleBackToExit()
     var titleTextValue by remember { mutableStateOf("") }
     val taskList by taskViewModel.taskList.collectAsState()
+    val date = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy")
+    val formattedDate = date.format(formatter)
 
     Column {
         Text(text = "Hello Local Database Screen")
@@ -48,7 +53,11 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
         Button(
             onClick = {
                 if (titleTextValue.isNotBlank()) {
-                    val newTask = Task(0, titleTextValue)
+                    val newTask = Task(
+                        title = titleTextValue,
+                        done = false,
+                        createdDate = formattedDate
+                    )
                     taskViewModel.addTask(newTask)
                     titleTextValue = ""
                 }
@@ -61,6 +70,9 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
         LazyColumn {
             items(taskList) { task ->
                 TaskItem(task = task)
+                Button(onClick = {
+                    taskViewModel.deleteTask(task)
+                }) { Text("Delete") }
             }
         }
     }

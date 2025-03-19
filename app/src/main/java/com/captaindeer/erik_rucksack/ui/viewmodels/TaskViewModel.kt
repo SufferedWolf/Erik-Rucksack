@@ -4,10 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.captaindeer.erik_rucksack.data.LocalDatabaseApp.Task
 import com.captaindeer.erik_rucksack.data.ErikRucksackDatabase
-import com.captaindeer.erik_rucksack.data.LocalDatabaseApp.TaskRepository
-import kotlinx.coroutines.Dispatchers
+import com.captaindeer.erik_rucksack.data.localDatabaseApp.Task
+import com.captaindeer.erik_rucksack.data.localDatabaseApp.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,15 +30,21 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         readAllData = repository.readAllData
 
         viewModelScope.launch {
-            readAllData.observeForever{ tasks ->
+            readAllData.observeForever { tasks ->
                 _taskList.value = tasks
             }
         }
     }
 
     fun addTask(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.addTask(task)
+        }
+    }
+
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            repository.deleteTask(task)
         }
     }
 
