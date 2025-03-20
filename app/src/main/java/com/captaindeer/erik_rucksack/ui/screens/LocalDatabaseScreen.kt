@@ -28,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -72,11 +71,10 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
         OutlinedTextField(
             value = titleTextValue,
             onValueChange = { titleTextValue = it },
-            label = { Text("Título de la nota") },
+            label = { Text("Escribe tu nota") },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF6200EA),
-                cursorColor = Color(0xFF6200EA)
+                focusedBorderColor = Color(0xFF6200EA), cursorColor = Color(0xFF6200EA)
             ),
             shape = RoundedCornerShape(12.dp)
         )
@@ -87,9 +85,7 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
             onClick = {
                 if (titleTextValue.isNotBlank()) {
                     val newTask = Task(
-                        title = titleTextValue,
-                        done = false,
-                        createdDate = formattedDate
+                        title = titleTextValue, done = false, createdDate = formattedDate
                     )
                     taskViewModel.addTask(newTask)
                     titleTextValue = ""
