@@ -47,5 +47,4 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             repository.deleteTask(task)
         }
     }
-
 }
