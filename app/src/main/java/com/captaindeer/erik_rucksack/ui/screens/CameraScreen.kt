@@ -6,10 +6,8 @@ package com.captaindeer.erik_rucksack.ui.screens
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.captaindeer.erik_rucksack.core.utils.ScreensBackHandlerCustom
 
 @Composable
-fun CameraScreen(){
-    ScreensBackHandlerCustom.DoubleBackToExit()
+fun CameraScreen() {
     Text(text = "Hello Camera Screen!")
 }

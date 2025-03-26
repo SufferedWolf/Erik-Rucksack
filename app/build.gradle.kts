@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp") version "2.0.21-1.0.26"
-    id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 android {
@@ -68,9 +66,6 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.xcoil.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

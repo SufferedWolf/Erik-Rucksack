@@ -4,12 +4,143 @@ package com.captaindeer.erik_rucksack.ui.screens
  * Created by suffered on 18/03/25
  */
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.captaindeer.erik_rucksack.core.utils.ScreensBackHandlerCustom
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.captaindeer.erik_rucksack.data.apiRest.CharactersRepository
+import com.captaindeer.erik_rucksack.data.apiRest.model.Character
+import com.captaindeer.erik_rucksack.ui.viewmodels.CharacterViewModel
+import com.captaindeer.erik_rucksack.ui.viewmodels.CharacterViewModelFactory
 
 @Composable
-fun ApiConsumptionScreen(){
-    ScreensBackHandlerCustom.DoubleBackToExit()
-    Text(text = "Hello API Consumption Screen!")
+fun ApiConsumptionScreen() {
+    val repository = remember { CharactersRepository() }
+    val viewModel: CharacterViewModel = viewModel(factory = CharacterViewModelFactory(repository))
+    val state by viewModel.state.collectAsState(initial = emptyList())
+
+    LazyColumn {
+        items(
+            items = state, key = { character -> character.id }) { character ->
+            CharacterCard(character)
+        }
+    }
+}
+
+
+@Composable
+fun CharacterCard(character: Character) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
+    Card(
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
+    ) {
+        Column {
+            Row {
+                Surface(
+                    modifier = Modifier.size(120.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .2f)
+                ) {
+                    AsyncImage(
+                        model = character.image,
+                        contentDescription = character.name,
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterVertically)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = character.name, style = MaterialTheme.typography.titleLarge
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val color = when (character.status) {
+                            "Alive" -> Color.Green
+                            "Dead" -> Color.Red
+                            else -> Color.Gray
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(2.dp)
+                                .clip(CircleShape)
+                                .background(color)
+                                .size(12.dp)
+                        )
+                        Text(
+                            text = "${character.status} - ${character.species}",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+                }
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.ExpandLess
+                        else Icons.Filled.ExpandMore, contentDescription = "Mas informacion"
+                    )
+                }
+            }
+            if (expanded) {
+                Row(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "Ultima aparicion", style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = character.location.name,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
