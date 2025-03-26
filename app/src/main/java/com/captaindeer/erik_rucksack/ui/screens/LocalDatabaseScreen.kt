@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.captaindeer.erik_rucksack.core.utils.ScreensBackHandlerCustom
 import com.captaindeer.erik_rucksack.data.localDatabaseApp.Task
 import com.captaindeer.erik_rucksack.ui.viewmodels.TaskViewModel
 import java.time.LocalDate
@@ -67,7 +66,6 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
         OutlinedTextField(
             value = titleTextValue,
             onValueChange = { titleTextValue = it },
@@ -109,7 +107,6 @@ fun LocalDatabaseScreen(taskViewModel: TaskViewModel = viewModel()) {
                 TaskItem(task = task, onDeleteClick = { taskViewModel.deleteTask(task) })
             }
         }
-        ScreensBackHandlerCustom.DoubleBackToExit()
     }
 }
 
