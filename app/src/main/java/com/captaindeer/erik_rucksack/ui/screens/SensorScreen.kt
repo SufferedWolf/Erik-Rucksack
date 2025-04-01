@@ -4,6 +4,7 @@ package com.captaindeer.erik_rucksack.ui.screens
  * Created by suffered on 18/03/25
  */
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -11,14 +12,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +42,7 @@ import com.captaindeer.erik_rucksack.ui.viewmodels.CompassViewModel
 import com.captaindeer.erik_rucksack.ui.viewmodels.GyroscopeViewModel
 import com.captaindeer.erik_rucksack.ui.viewmodels.LightViewModel
 import com.captaindeer.erik_rucksack.ui.viewmodels.TemperatureViewModel
+import com.captaindeer.erik_rucksack.ui.viewmodels.WifiSignalViewModel
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -50,7 +56,8 @@ fun SensorScreen() {
     //CompassScreen()
     //ShakeEnergyScreen()
     //WeatherMoodScreen()
-    SpinSpeedMeterScreen()
+    //SpinSpeedMeterScreen()
+    WifiSignalScreen()
 
 }
 
@@ -220,6 +227,41 @@ fun SpinSpeedMeterScreen(viewModel: GyroscopeViewModel = viewModel()) {
                 fontSize = 32.sp,
                 color = textColor
             )
+        }
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun WifiSignalScreen(viewModel: WifiSignalViewModel = viewModel()) {
+    val signalLevel by viewModel.signalStrength.collectAsState(initial = 0)
+    val wifiSpeed by viewModel.wifiSpeed.collectAsState(initial = 0)
+    val connectionType by viewModel.connectionType.collectAsState(initial = "No conectado")
+
+    Scaffold {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Conexión: $connectionType", style = MaterialTheme.typography.titleLarge)
+            Text(text = "Velocidad: $wifiSpeed Mbps", style = MaterialTheme.typography.titleMedium)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Indicador de señal WiFi
+            Row {
+                for (i in 0..4) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 30.dp, height = (10 + (i * 10)).dp) // Aumenta la altura de cada barra
+                            .background(if (i <= signalLevel) Color.Green else Color.Gray)
+                            .padding(2.dp)
+                    )
+                }
+            }
         }
     }
 }
