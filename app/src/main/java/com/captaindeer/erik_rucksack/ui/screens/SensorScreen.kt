@@ -19,11 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -256,7 +254,10 @@ fun WifiSignalScreen(viewModel: WifiSignalViewModel = viewModel()) {
                 for (i in 0..4) {
                     Box(
                         modifier = Modifier
-                            .size(width = 30.dp, height = (10 + (i * 10)).dp) // Aumenta la altura de cada barra
+                            .size(
+                                width = 30.dp,
+                                height = (10 + (i * 10)).dp
+                            ) // Aumenta la altura de cada barra
                             .background(if (i <= signalLevel) Color.Green else Color.Gray)
                             .padding(2.dp)
                     )
