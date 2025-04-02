@@ -1,12 +1,25 @@
 package com.captaindeer.erik_rucksack.ui.viewmodels
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Context.SENSOR_SERVICE
+import android.content.Context.WIFI_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
+import android.net.NetworkCapabilities.TRANSPORT_WIFI
+import android.net.wifi.WifiManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -212,5 +225,55 @@ class GyroscopeViewModel(application: Application) : AndroidViewModel(applicatio
     override fun onCleared() {
         sensorManager.unregisterListener(this)
         super.onCleared()
+    }
+}
+
+class WifiSignalViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val _signalStrength = MutableStateFlow(0)
+    val signalStrength = _signalStrength.asStateFlow()
+
+    private val _wifiSpeed = MutableStateFlow(0)
+    val wifiSpeed = _wifiSpeed.asStateFlow()
+
+    private val _connectionType = MutableStateFlow("No conectado")
+    val connectionType = _connectionType.asStateFlow()
+
+    private val wifiManager = application.getSystemService(WIFI_SERVICE) as WifiManager
+    private val connectivityManager = application.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    private val wifiReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val wifiInfo = wifiManager.connectionInfo
+            _signalStrength.value = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
+            _wifiSpeed.value = wifiInfo.linkSpeed // Velocidad en Mbps
+            _connectionType.value = getConnectionType()
+        }
+    }
+
+    private fun getConnectionType(): String {
+        val network = connectivityManager.activeNetwork ?: return "No conectado"
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return "No conectado"
+
+        return when {
+            capabilities.hasTransport(TRANSPORT_WIFI) -> "WiFi"
+            capabilities.hasTransport(TRANSPORT_CELLULAR) -> "Datos móviles"
+            else -> "Desconocido"
+        }
+    }
+
+    init {
+        val filter = IntentFilter(WifiManager.RSSI_CHANGED_ACTION)
+        ContextCompat.registerReceiver(
+            application,
+            wifiReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        getApplication<Application>().unregisterReceiver(wifiReceiver)
     }
 }
