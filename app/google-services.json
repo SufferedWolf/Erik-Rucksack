@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "24211804843",
+    "project_id": "erik-rucksack",
+    "storage_bucket": "erik-rucksack.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24211804843:android:e33c17f7c98a6f1f311dee",
+        "android_client_info": {
+          "package_name": "com.captaindeer.erik_rucksack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwaNunpkVIxBQNUw5DEHbMVlIOhpCE-7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
