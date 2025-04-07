@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.captaindeer.erik_rucksack.ui.screens.ApiConsumptionScreen
 import com.captaindeer.erik_rucksack.ui.screens.CameraScreen
 import com.captaindeer.erik_rucksack.ui.screens.FirebaseScreen
+import com.captaindeer.erik_rucksack.ui.screens.HomeFirebaseScreen
 import com.captaindeer.erik_rucksack.ui.screens.InitialScreen
 import com.captaindeer.erik_rucksack.ui.screens.LocalDatabaseScreen
 import com.captaindeer.erik_rucksack.ui.screens.LoginScreen
@@ -36,15 +39,23 @@ import com.captaindeer.erik_rucksack.ui.screens.SignUpScreen
 import com.captaindeer.erik_rucksack.ui.screens.WatchTalkScreen
 import com.captaindeer.erik_rucksack.ui.viewmodels.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(auth: FirebaseAuth) {
-
     val navController = rememberNavController()
     var expanded by remember { mutableStateOf(false) }
     val loginVM = LoginViewModel(auth)
+    val user = auth.currentUser
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    LaunchedEffect(user, currentRoute) {
+        if (user != null && currentRoute == "initialScreen") {
+            navController.navigate("homeFirebaseScreen") {
+                popUpTo("homeFirebaseScreen") { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -132,12 +143,17 @@ fun AppNavigation(auth: FirebaseAuth) {
             composable("loginScreen") {
                 LoginScreen(
                     loginVM,
-                    navigateToHome = { navController.navigate("initialScreen") })
+                    navigateToHome = { navController.navigate("homeFirebaseScreen") })
             }
             composable("signUpScreen") {
                 SignUpScreen(
                     loginVM,
-                    navigateToHome = { navController.navigate("initialScreen") })
+                    navigateToHome = { navController.navigate("homeFirebaseScreen") })
+            }
+            composable("homeFirebaseScreen") {
+                HomeFirebaseScreen(
+                    loginVM,
+                    navigateToInitial = { navController.navigate("initialScreen") })
             }
         }
     }

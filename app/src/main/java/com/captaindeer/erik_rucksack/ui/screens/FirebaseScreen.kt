@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,12 +35,15 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.captaindeer.erik_rucksack.R
+import com.captaindeer.erik_rucksack.data.login.model.Artist
 import com.captaindeer.erik_rucksack.ui.viewmodels.LoginViewModel
 
 @Composable
@@ -208,5 +213,53 @@ fun SignUpScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) {
         Button(onClick = { viewModel.signUp(navigateToHome) }) {
             Text(text = "Sign Up")
         }
+    }
+}
+
+@Composable
+fun HomeFirebaseScreen(viewModel: LoginViewModel, navigateToInitial: () -> Unit) {
+
+    val artists = viewModel.artist.collectAsState()
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Black)
+    ) {
+        Text(
+            "Popular artist",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 30.sp,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        println("Aqui vamos ${artists.value}")
+
+        LazyRow {
+            items(artists.value) {
+                ArtistItem(it)
+            }
+        }
+
+        Button(onClick = { viewModel.logout(navigateToInitial) }) {
+            Text("Cerrar sesion")
+        }
+    }
+}
+
+@Composable
+fun ArtistItem(artist: Artist) {
+    Column {
+        AsyncImage(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(CircleShape),
+            model = artist.image,
+            contentDescription = "Artist image",
+            contentScale = ContentScale.Fit
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = artist.name.orEmpty(), color = Color.White)
     }
 }

@@ -35,8 +35,6 @@ class MainActivity : ComponentActivity() {
         if (currentUser != null) {
             //navegar a la home
             Log.i("erik", "Estoy logado")
-
-            auth.signOut()
         }
     }
 }

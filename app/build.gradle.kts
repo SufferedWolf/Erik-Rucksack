@@ -47,6 +47,7 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.media3.common.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
