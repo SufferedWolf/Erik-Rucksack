@@ -4,10 +4,6 @@ package com.captaindeer.erik_rucksack.core.navigation
  * Created by suffered on 18/03/25
  */
 
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -20,32 +16,46 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.captaindeer.erik_rucksack.ui.screens.ApiConsumptionScreen
 import com.captaindeer.erik_rucksack.ui.screens.CameraScreen
 import com.captaindeer.erik_rucksack.ui.screens.FirebaseScreen
+import com.captaindeer.erik_rucksack.ui.screens.HomeFirebaseScreen
+import com.captaindeer.erik_rucksack.ui.screens.InitialScreen
 import com.captaindeer.erik_rucksack.ui.screens.LocalDatabaseScreen
+import com.captaindeer.erik_rucksack.ui.screens.LoginScreen
 import com.captaindeer.erik_rucksack.ui.screens.ResumeScreen
 import com.captaindeer.erik_rucksack.ui.screens.SensorScreen
+import com.captaindeer.erik_rucksack.ui.screens.SignUpScreen
 import com.captaindeer.erik_rucksack.ui.screens.WatchTalkScreen
-import kotlin.system.exitProcess
+import com.captaindeer.erik_rucksack.ui.viewmodels.LoginViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation() {
-
+fun AppNavigation(auth: FirebaseAuth) {
     val navController = rememberNavController()
     var expanded by remember { mutableStateOf(false) }
+    val loginVM = LoginViewModel(auth)
+    val user = auth.currentUser
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    LaunchedEffect(user, currentRoute) {
+        if (user != null && currentRoute == "initialScreen") {
+            navController.navigate("homeFirebaseScreen") {
+                popUpTo("homeFirebaseScreen") { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -74,10 +84,10 @@ fun AppNavigation() {
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("🏠 firebaseScreen") },
+                            text = { Text("🏠 initialScreen") },
                             onClick = {
                                 expanded = false
-                                navController.navigate("firebaseScreen")
+                                navController.navigate("initialScreen")
                             }
                         )
                         DropdownMenuItem(
@@ -125,36 +135,25 @@ fun AppNavigation() {
             composable("resumeScreen") { ResumeScreen() }
             composable("sensorScreen") { SensorScreen() }
             composable("watchTalkScreen") { WatchTalkScreen() }
-        }
-    }
-}
-
-@Composable
-fun DoubleBackToExitScren(navController: NavController) {
-    val context = LocalContext.current
-    var backPressedTime by remember { mutableStateOf(0L) }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Presiona atrás dos veces para salir")
-
-        // Intercepta el botón de atrás
-        BackHandler {
-            val currentTime = System.currentTimeMillis()
-
-            // Si el tiempo entre los dos clics es menor a 2 segundos, cierra la app
-            if (currentTime - backPressedTime < 2000) {
-                exitProcess(0) // Cierra la app completamente
-            } else {
-                backPressedTime = currentTime
-                Toast.makeText(context, "Presiona nuevamente para salir", Toast.LENGTH_SHORT).show()
-
-                // Limpia el stack de navegación para evitar que regrese a otra pantalla
-                if (navController.previousBackStackEntry != null) {
-                    navController.popBackStack(navController.graph.startDestinationId, inclusive = true)
-                }
+            composable("initialScreen") {
+                InitialScreen(
+                    navigateToLogin = { navController.navigate("loginScreen") },
+                    navigateToSignUp = { navController.navigate("signUpScreen") })
+            }
+            composable("loginScreen") {
+                LoginScreen(
+                    loginVM,
+                    navigateToHome = { navController.navigate("homeFirebaseScreen") })
+            }
+            composable("signUpScreen") {
+                SignUpScreen(
+                    loginVM,
+                    navigateToHome = { navController.navigate("homeFirebaseScreen") })
+            }
+            composable("homeFirebaseScreen") {
+                HomeFirebaseScreen(
+                    loginVM,
+                    navigateToInitial = { navController.navigate("initialScreen") })
             }
         }
     }
